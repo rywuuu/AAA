@@ -1,4 +1,4 @@
-const CACHE_NAME = "ai-journal-pwa-v1";
+const CACHE_NAME = "ai-journal-pwa-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -54,14 +54,20 @@ self.addEventListener("fetch", (event) => {
 
   event.respondWith(
     caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request)
+      const fetchPromise = fetch(request)
         .then((response) => {
+          if (!response || !response.ok) return response;
           const copy = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
           return response;
         })
         .catch(() => cached);
+
+      if (cached) {
+        event.waitUntil(fetchPromise);
+        return cached;
+      }
+      return fetchPromise;
     })
   );
 });
