@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="walk">
+  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <circle cx="130" cy="60" r="16" />
+    <path d="M130 76l-5 35" />
+    <path d="M125 95l-25 25" />
+    <path d="M125 95l25 15" />
+    <path d="M125 110l-20 40" />
+    <path d="M125 110l30 35" />
+    <path d="M150 86l30-5" />
+    <rect x="175" y="70" width="40" height="50" rx="10" />
+  </g>
+  <circle cx="205" cy="140" r="10" fill="#c75442" />
+</svg>

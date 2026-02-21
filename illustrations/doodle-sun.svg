@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="sun">
+  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <circle cx="150" cy="90" r="30" />
+    <path d="M150 40v-15" />
+    <path d="M150 155v15" />
+    <path d="M105 90H90" />
+    <path d="M210 90h-15" />
+    <path d="M120 60l-12-12" />
+    <path d="M180 60l12-12" />
+    <path d="M120 120l-12 12" />
+    <path d="M180 120l12 12" />
+  </g>
+  <circle cx="190" cy="90" r="10" fill="#c75442" />
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="hug">
+  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <circle cx="115" cy="70" r="18" />
+    <circle cx="185" cy="70" r="18" />
+    <path d="M80 140c15-30 35-40 70-40s55 10 70 40" />
+    <path d="M90 120c25 20 45 30 60 30" />
+    <path d="M210 120c-25 20-45 30-60 30" />
+  </g>
+  <circle cx="150" cy="120" r="10" fill="#c75442" />
+</svg>

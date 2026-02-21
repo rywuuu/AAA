@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="calendar">
+  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="60" y="50" width="180" height="110" rx="16" />
+    <path d="M90 40v20" />
+    <path d="M210 40v20" />
+    <path d="M60 80h180" />
+    <path d="M90 110h30" />
+    <path d="M140 110h30" />
+    <path d="M190 110h30" />
+    <path d="M90 140h30" />
+    <path d="M140 140h30" />
+  </g>
+  <circle cx="210" cy="140" r="10" fill="#c75442" />
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="mountain">
+  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M50 150l70-100 40 60 30-35 70 75" />
+    <path d="M90 95l30 25" />
+    <path d="M170 90l20 25" />
+  </g>
+  <circle cx="220" cy="60" r="10" fill="#c75442" />
+</svg>

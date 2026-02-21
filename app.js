@@ -92,8 +92,45 @@ const ILLUSTRATIONS = [
   "doodle-heart.svg",
   "doodle-moon.svg",
   "doodle-waves.svg",
-  "doodle-books.svg"
+  "doodle-books.svg",
+  "doodle-calendar.svg",
+  "doodle-tv.svg",
+  "doodle-hug.svg",
+  "doodle-laptop.svg",
+  "doodle-walk.svg",
+  "doodle-bulb.svg",
+  "doodle-chat.svg",
+  "doodle-mirror.svg",
+  "doodle-sun.svg",
+  "doodle-food.svg",
+  "doodle-mountain.svg"
 ];
+
+const ILLUSTRATION_KEYWORDS = [
+  { keywords: ["蔬菜", "吃", "食", "料理", "菜"], pool: ["doodle-food.svg"] },
+  { keywords: ["節目", "電影", "影集", "電視"], pool: ["doodle-tv.svg"] },
+  { keywords: ["擁抱", "抱", "親密"], pool: ["doodle-hug.svg", "doodle-heart.svg"] },
+  { keywords: ["書", "閱讀", "學", "學會", "學習"], pool: ["doodle-books.svg"] },
+  { keywords: ["專案", "工作", "任務"], pool: ["doodle-laptop.svg"] },
+  { keywords: ["旅行", "走", "散步", "路"], pool: ["doodle-walk.svg"] },
+  { keywords: ["靈感", "想法", "點子", "提醒"], pool: ["doodle-bulb.svg"] },
+  { keywords: ["關係", "溝通", "談", "分享", "對話"], pool: ["doodle-chat.svg"] },
+  { keywords: ["自我", "照顧", "情緒", "心情", "反思"], pool: ["doodle-mirror.svg", "doodle-heart.svg"] }
+];
+
+const ILLUSTRATION_BY_TYPE = {
+  daily: [
+    "doodle-plant.svg",
+    "doodle-mug.svg",
+    "doodle-heart.svg",
+    "doodle-moon.svg",
+    "doodle-waves.svg",
+    "doodle-sun.svg"
+  ],
+  weekly: ["doodle-calendar.svg", "doodle-waves.svg", "doodle-mountain.svg"],
+  monthly: ["doodle-calendar.svg", "doodle-mountain.svg", "doodle-books.svg"],
+  quarterly: ["doodle-mountain.svg", "doodle-calendar.svg", "doodle-bulb.svg"]
+};
 
 const state = loadState();
 
@@ -600,6 +637,12 @@ function selectDate(dateStr) {
     dailyQuestionText.textContent = entry.question;
     questionMeta.textContent = buildMetaLabel(entry);
     dailyAnswer.value = entry.answer || "";
+    if (!entry.illustration) {
+      const type = resolveQuestionType(entry);
+      entry.illustration = pickIllustrationForQuestion(parseDate(dateStr), entry.question, type, entry.redrawCount || 0);
+      entry.questionType = type;
+      saveState();
+    }
     setIllustration(entry.illustration);
   } else {
     tarotCard.classList.remove("revealed");
@@ -617,15 +660,22 @@ function revealDailyQuestion(dateStr) {
     dailyQuestionText.textContent = entry.question;
     questionMeta.textContent = buildMetaLabel(entry);
     dailyAnswer.value = entry.answer || "";
+    if (!entry.illustration) {
+      const type = resolveQuestionType(entry);
+      entry.illustration = pickIllustrationForQuestion(parseDate(dateStr), entry.question, type, entry.redrawCount || 0);
+      entry.questionType = type;
+      saveState();
+    }
     setIllustration(entry.illustration);
     return;
   }
   const date = parseDate(dateStr);
   const question = pickDailyQuestion(date, 0, "");
-  const illustration = pickIllustration(date, 0);
+  const illustration = pickIllustrationForQuestion(date, question.text, question.type, 0);
   state.dailyEntries[dateStr] = {
     question: question.text,
     questionId: question.id,
+    questionType: question.type,
     meta: question.meta,
     answer: "",
     redrawCount: 0,
@@ -666,15 +716,22 @@ function pickDailyQuestion(date, redrawCount = 0, avoidId = "") {
   return {
     id: resolvedId,
     text: pool[index] || DEFAULT_POOLS.daily[0],
-    meta: buildMeta(date, selectedType)
+    meta: buildMeta(date, selectedType),
+    type: selectedType
   };
 }
 
-function pickIllustration(date, redrawCount = 0) {
-  const seed = hashString(`${formatDate(date)}-illu-${redrawCount}`);
+function pickIllustrationForQuestion(date, questionText, questionType, redrawCount = 0, avoid = "") {
+  const pool = getIllustrationPool(questionText, questionType);
+  const seed = hashString(`${formatDate(date)}-illu-${redrawCount}-${questionText}`);
   const rng = seededRandom(seed);
-  const index = Math.floor(rng() * ILLUSTRATIONS.length);
-  return ILLUSTRATIONS[index];
+  let index = Math.floor(rng() * pool.length);
+  let picked = pool[index] || ILLUSTRATIONS[0];
+  if (avoid && picked === avoid && pool.length > 1) {
+    index = (index + 1) % pool.length;
+    picked = pool[index];
+  }
+  return picked;
 }
 
 function buildWeights(date) {
@@ -728,11 +785,12 @@ function redrawDailyQuestion() {
   const redrawCount = (existing.redrawCount || 0) + 1;
   const date = parseDate(dateStr);
   const question = pickDailyQuestion(date, redrawCount, existing.questionId);
-  const illustration = pickIllustration(date, redrawCount);
+  const illustration = pickIllustrationForQuestion(date, question.text, question.type, redrawCount, existing.illustration || "");
   state.dailyEntries[dateStr] = {
     ...existing,
     question: question.text,
     questionId: question.id,
+    questionType: question.type,
     meta: question.meta,
     answer: "",
     redrawCount,
@@ -785,6 +843,29 @@ function setIllustration(filename) {
   }
   dailyIllustration.src = `illustrations/${filename}`;
   dailyIllustration.style.display = "block";
+}
+
+function getIllustrationPool(questionText, questionType) {
+  if (questionText) {
+    for (const rule of ILLUSTRATION_KEYWORDS) {
+      if (rule.keywords.some((keyword) => questionText.includes(keyword))) {
+        return rule.pool;
+      }
+    }
+  }
+  if (ILLUSTRATION_BY_TYPE[questionType]) {
+    return ILLUSTRATION_BY_TYPE[questionType];
+  }
+  return ILLUSTRATIONS;
+}
+
+function resolveQuestionType(entry) {
+  if (entry.questionType) return entry.questionType;
+  if (entry.questionId) {
+    const prefix = entry.questionId.split("-")[0];
+    if (DEFAULT_POOLS[prefix]) return prefix;
+  }
+  return "daily";
 }
 
 function renderRecent() {

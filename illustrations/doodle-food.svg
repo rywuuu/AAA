@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="food">
+  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M60 130c20 25 160 25 180 0" />
+    <path d="M70 120c20-40 140-40 160 0" />
+    <path d="M110 90c-8-12-8-22 0-34" />
+    <path d="M150 88c-8-12-8-22 0-34" />
+    <path d="M190 90c-8-12-8-22 0-34" />
+  </g>
+  <circle cx="210" cy="115" r="10" fill="#c75442" />
+</svg>
