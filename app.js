@@ -649,9 +649,9 @@ function buildWeights(date) {
   const isQuarterEnd = isMonthEnd && [2, 5, 8, 11].includes(date.getMonth());
   const base = [
     { type: "daily", weight: 0.7 },
-    { type: "weekly", weight: isWeekEnd ? 0.18 : 0.05 },
-    { type: "monthly", weight: isMonthEnd ? 0.08 : 0.02 },
-    { type: "quarterly", weight: isQuarterEnd ? 0.04 : 0.01 }
+    { type: "weekly", weight: isWeekEnd ? 0.18 : 0 },
+    { type: "monthly", weight: isMonthEnd ? 0.08 : 0 },
+    { type: "quarterly", weight: isQuarterEnd ? 0.04 : 0 }
   ];
   const total = base.reduce((sum, item) => sum + item.weight, 0);
   return base.map((item) => ({ ...item, weight: item.weight / total }));
