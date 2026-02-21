@@ -105,6 +105,8 @@ const clearAnswerBtn = document.getElementById("clear-answer");
 const drawCardMobileBtn = document.getElementById("draw-card-mobile");
 const saveAnswerMobileBtn = document.getElementById("save-answer-mobile");
 const clearAnswerMobileBtn = document.getElementById("clear-answer-mobile");
+const redrawQuestionBtn = document.getElementById("redraw-question");
+const redrawQuestionMobileBtn = document.getElementById("redraw-question-mobile");
 const recentList = document.getElementById("recent-list");
 const deepCategories = document.getElementById("deep-categories");
 const deepQuestionEl = document.getElementById("deep-question");
@@ -219,6 +221,9 @@ function bindDailyActions() {
     }
     revealDailyQuestion(state.selectedDate);
   });
+
+  redrawQuestionBtn?.addEventListener("click", redrawDailyQuestion);
+  redrawQuestionMobileBtn?.addEventListener("click", redrawDailyQuestion);
 
   tarotCard.addEventListener("click", () => {
     if (!state.selectedDate) {
@@ -583,7 +588,7 @@ function selectDate(dateStr) {
   if (entry) {
     tarotCard.classList.add("revealed");
     dailyQuestionText.textContent = entry.question;
-    questionMeta.textContent = entry.meta || "";
+    questionMeta.textContent = buildMetaLabel(entry);
     dailyAnswer.value = entry.answer || "";
   } else {
     tarotCard.classList.remove("revealed");
@@ -598,17 +603,18 @@ function revealDailyQuestion(dateStr) {
   if (entry) {
     tarotCard.classList.add("revealed");
     dailyQuestionText.textContent = entry.question;
-    questionMeta.textContent = entry.meta || "";
+    questionMeta.textContent = buildMetaLabel(entry);
     dailyAnswer.value = entry.answer || "";
     return;
   }
   const date = parseDate(dateStr);
-  const question = pickDailyQuestion(date);
+  const question = pickDailyQuestion(date, 0, "");
   state.dailyEntries[dateStr] = {
     question: question.text,
     questionId: question.id,
     meta: question.meta,
     answer: "",
+    redrawCount: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -620,8 +626,8 @@ function revealDailyQuestion(dateStr) {
   renderCalendar();
 }
 
-function pickDailyQuestion(date) {
-  const seed = hashString(formatDate(date));
+function pickDailyQuestion(date, redrawCount = 0, avoidId = "") {
+  const seed = hashString(`${formatDate(date)}-${redrawCount}`);
   const rng = seededRandom(seed);
   const weights = buildWeights(date);
   const roll = rng();
@@ -635,9 +641,14 @@ function pickDailyQuestion(date) {
     }
   }
   const pool = getPool(selectedType);
-  const index = Math.floor(rng() * pool.length);
+  let index = Math.floor(rng() * pool.length);
+  let resolvedId = `${selectedType}-${index}`;
+  if (avoidId && resolvedId === avoidId && pool.length > 1) {
+    index = (index + 1) % pool.length;
+    resolvedId = `${selectedType}-${index}`;
+  }
   return {
-    id: `${selectedType}-${index}`,
+    id: resolvedId,
     text: pool[index] || DEFAULT_POOLS.daily[0],
     meta: buildMeta(date, selectedType)
   };
@@ -677,6 +688,42 @@ function saveDailyAnswer() {
   showToast("已保存");
 }
 
+function redrawDailyQuestion() {
+  if (!state.selectedDate) {
+    showToast("請先選擇日期");
+    return;
+  }
+  const dateStr = state.selectedDate;
+  const existing = state.dailyEntries[dateStr];
+  if (!existing) {
+    revealDailyQuestion(dateStr);
+    return;
+  }
+  if (!confirm("要重新抽題嗎？此日期的回答會被清除。")) {
+    return;
+  }
+  const redrawCount = (existing.redrawCount || 0) + 1;
+  const date = parseDate(dateStr);
+  const question = pickDailyQuestion(date, redrawCount, existing.questionId);
+  state.dailyEntries[dateStr] = {
+    ...existing,
+    question: question.text,
+    questionId: question.id,
+    meta: question.meta,
+    answer: "",
+    redrawCount,
+    updatedAt: new Date().toISOString()
+  };
+  tarotCard.classList.add("revealed");
+  dailyQuestionText.textContent = question.text;
+  questionMeta.textContent = buildMetaLabel(state.dailyEntries[dateStr]);
+  dailyAnswer.value = "";
+  saveState();
+  renderRecent();
+  renderCalendar();
+  showToast("已重新抽題");
+}
+
 function clearDailyAnswer() {
   if (!state.selectedDate) {
     return;
@@ -693,6 +740,14 @@ function clearDailyAnswer() {
   saveState();
   renderRecent();
   renderCalendar();
+}
+
+function buildMetaLabel(entry) {
+  if (!entry) return "";
+  if (entry.redrawCount) {
+    return `${entry.meta || ""} · 重抽第 ${entry.redrawCount} 次`.trim();
+  }
+  return entry.meta || "";
 }
 
 function renderRecent() {

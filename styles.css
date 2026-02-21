@@ -195,6 +195,11 @@ button.ghost.danger {
   margin-bottom: 16px;
 }
 
+.panel-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .panel-header h2 {
   margin: 0;
   font-size: 18px;
@@ -672,7 +677,7 @@ button.ghost.danger {
     backdrop-filter: blur(10px);
     border-top: 1px solid var(--line);
     gap: 10px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
     z-index: 40;
   }
 
@@ -680,6 +685,10 @@ button.ghost.danger {
     width: 100%;
     padding: 12px 10px;
     border-radius: 16px;
+  }
+
+  .journal-panel .panel-actions {
+    display: none;
   }
 
   .answer-actions,

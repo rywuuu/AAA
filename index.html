@@ -59,7 +59,10 @@
             <div class="panel journal-panel">
               <div class="panel-header">
                 <h2 id="selected-date-label">請先選擇日期</h2>
-                <button id="draw-card" class="accent">抽一張</button>
+                <div class="panel-actions">
+                  <button id="draw-card" class="accent">抽一張</button>
+                  <button id="redraw-question" class="ghost">重新抽題</button>
+                </div>
               </div>
               <div class="tarot">
                 <div class="tarot-card" id="tarot-card">
@@ -96,6 +99,7 @@
           </div>
           <div class="mobile-dock" data-dock="daily">
             <button id="draw-card-mobile" class="accent">抽一張</button>
+            <button id="redraw-question-mobile" class="ghost">重抽</button>
             <button id="save-answer-mobile" class="ghost">保存</button>
             <button id="clear-answer-mobile" class="ghost">清除</button>
           </div>
