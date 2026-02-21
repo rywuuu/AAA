@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="waves">
+  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M40 90c20-12 40-12 60 0s40 12 60 0 40-12 60 0" />
+    <path d="M40 120c20-12 40-12 60 0s40 12 60 0 40-12 60 0" />
+    <path d="M70 60c-10-12-10-22 0-34" />
+  </g>
+  <circle cx="210" cy="60" r="10" fill="#c75442" />
+</svg>

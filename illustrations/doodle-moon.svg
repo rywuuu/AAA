@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="moon">
+  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M180 50c-30 10-50 40-44 72 6 30 34 52 70 48-22 16-50 18-76 6-38-18-54-64-36-102 14-30 48-46 86-24z" />
+    <path d="M70 150c20-10 40-10 60 0" />
+  </g>
+  <circle cx="220" cy="90" r="10" fill="#c75442" />
+</svg>

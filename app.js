@@ -86,6 +86,15 @@ const DEFAULT_STATE = {
   selectedDate: ""
 };
 
+const ILLUSTRATIONS = [
+  "doodle-plant.svg",
+  "doodle-mug.svg",
+  "doodle-heart.svg",
+  "doodle-moon.svg",
+  "doodle-waves.svg",
+  "doodle-books.svg"
+];
+
 const state = loadState();
 
 const navButtons = document.querySelectorAll(".nav-btn");
@@ -100,6 +109,7 @@ const tarotCard = document.getElementById("tarot-card");
 const dailyQuestionText = document.getElementById("daily-question-text");
 const dailyAnswer = document.getElementById("daily-answer");
 const questionMeta = document.getElementById("question-meta");
+const dailyIllustration = document.getElementById("daily-illustration");
 const saveAnswerBtn = document.getElementById("save-answer");
 const clearAnswerBtn = document.getElementById("clear-answer");
 const drawCardMobileBtn = document.getElementById("draw-card-mobile");
@@ -590,11 +600,13 @@ function selectDate(dateStr) {
     dailyQuestionText.textContent = entry.question;
     questionMeta.textContent = buildMetaLabel(entry);
     dailyAnswer.value = entry.answer || "";
+    setIllustration(entry.illustration);
   } else {
     tarotCard.classList.remove("revealed");
     dailyQuestionText.textContent = "請抽牌揭示今日提問";
     questionMeta.textContent = "";
     dailyAnswer.value = "";
+    setIllustration("");
   }
 }
 
@@ -605,16 +617,19 @@ function revealDailyQuestion(dateStr) {
     dailyQuestionText.textContent = entry.question;
     questionMeta.textContent = buildMetaLabel(entry);
     dailyAnswer.value = entry.answer || "";
+    setIllustration(entry.illustration);
     return;
   }
   const date = parseDate(dateStr);
   const question = pickDailyQuestion(date, 0, "");
+  const illustration = pickIllustration(date, 0);
   state.dailyEntries[dateStr] = {
     question: question.text,
     questionId: question.id,
     meta: question.meta,
     answer: "",
     redrawCount: 0,
+    illustration,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -622,6 +637,7 @@ function revealDailyQuestion(dateStr) {
   dailyQuestionText.textContent = question.text;
   questionMeta.textContent = question.meta;
   dailyAnswer.value = "";
+  setIllustration(illustration);
   saveState();
   renderCalendar();
 }
@@ -652,6 +668,13 @@ function pickDailyQuestion(date, redrawCount = 0, avoidId = "") {
     text: pool[index] || DEFAULT_POOLS.daily[0],
     meta: buildMeta(date, selectedType)
   };
+}
+
+function pickIllustration(date, redrawCount = 0) {
+  const seed = hashString(`${formatDate(date)}-illu-${redrawCount}`);
+  const rng = seededRandom(seed);
+  const index = Math.floor(rng() * ILLUSTRATIONS.length);
+  return ILLUSTRATIONS[index];
 }
 
 function buildWeights(date) {
@@ -705,6 +728,7 @@ function redrawDailyQuestion() {
   const redrawCount = (existing.redrawCount || 0) + 1;
   const date = parseDate(dateStr);
   const question = pickDailyQuestion(date, redrawCount, existing.questionId);
+  const illustration = pickIllustration(date, redrawCount);
   state.dailyEntries[dateStr] = {
     ...existing,
     question: question.text,
@@ -712,12 +736,14 @@ function redrawDailyQuestion() {
     meta: question.meta,
     answer: "",
     redrawCount,
+    illustration,
     updatedAt: new Date().toISOString()
   };
   tarotCard.classList.add("revealed");
   dailyQuestionText.textContent = question.text;
   questionMeta.textContent = buildMetaLabel(state.dailyEntries[dateStr]);
   dailyAnswer.value = "";
+  setIllustration(illustration);
   saveState();
   renderRecent();
   renderCalendar();
@@ -748,6 +774,17 @@ function buildMetaLabel(entry) {
     return `${entry.meta || ""} · 重抽第 ${entry.redrawCount} 次`.trim();
   }
   return entry.meta || "";
+}
+
+function setIllustration(filename) {
+  if (!dailyIllustration) return;
+  if (!filename) {
+    dailyIllustration.removeAttribute("src");
+    dailyIllustration.style.display = "none";
+    return;
+  }
+  dailyIllustration.src = `illustrations/${filename}`;
+  dailyIllustration.style.display = "block";
 }
 
 function renderRecent() {

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="mug">
+  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="70" y="70" width="120" height="80" rx="16" />
+    <path d="M190 90h20c18 0 18 40 0 40h-20" />
+    <path d="M95 60c-10-12-10-22 0-34" />
+    <path d="M125 60c-10-12-10-22 0-34" />
+  </g>
+  <circle cx="110" cy="110" r="10" fill="#c75442" />
+</svg>

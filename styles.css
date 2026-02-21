@@ -348,6 +348,16 @@ button.ghost.danger {
   transform: rotateY(180deg);
 }
 
+.daily-illustration {
+  width: min(220px, 90%);
+  height: auto;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.6);
+  padding: 10px;
+}
+
 .tarot-icon {
   font-size: 42px;
   margin-bottom: 12px;
