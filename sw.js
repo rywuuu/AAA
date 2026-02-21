@@ -5,8 +5,12 @@ const ASSETS = [
   "./styles.css",
   "./app.js",
   "./manifest.webmanifest",
-  "./icons/icon.svg",
-  "./icons/maskable.svg"
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
+  "./icons/maskable-512.png",
+  "./icons/apple-touch-180.png",
+  "./screenshots/wide-1280x720.png",
+  "./screenshots/narrow-750x1334.png"
 ];
 
 self.addEventListener("install", (event) => {
@@ -30,6 +34,8 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
+  const url = new URL(request.url);
+  if (url.protocol !== "http:" && url.protocol !== "https:") return;
 
   if (request.mode === "navigate") {
     event.respondWith(
@@ -43,6 +49,8 @@ self.addEventListener("fetch", (event) => {
     );
     return;
   }
+
+  if (!url.href.startsWith(self.location.origin)) return;
 
   event.respondWith(
     caches.match(request).then((cached) => {
