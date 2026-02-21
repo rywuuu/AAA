@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#255e9f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="一日一問" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>一日一問｜深度交流</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon.svg" />
+    <link rel="apple-touch-icon" href="icons/icon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app" class="app">
+      <header class="app-header">
+        <div class="brand">
+          <div class="brand-mark">一</div>
+          <div>
+            <h1>一日一問</h1>
+            <p class="subtitle">以問題記錄人生，以交流理解彼此</p>
+          </div>
+        </div>
+        <nav class="nav">
+          <button class="nav-btn is-active" data-view="daily">一日一問</button>
+          <button class="nav-btn" data-view="deep">深度交流</button>
+          <button class="nav-btn" data-view="settings">設定</button>
+        </nav>
+        <div class="header-actions">
+          <button id="lock-btn" class="ghost">上鎖</button>
+          <button id="party-toggle" class="accent">派對模式</button>
+        </div>
+      </header>
+
+      <main class="views">
+        <section id="view-daily" class="view is-active">
+          <div class="grid two-col daily-grid">
+            <div class="panel calendar-panel">
+              <div class="panel-header">
+                <h2>日曆</h2>
+                <div class="calendar-controls">
+                  <button id="prev-month" class="ghost">上個月</button>
+                  <div id="month-label" class="month-label">2026 年 02 月</div>
+                  <button id="next-month" class="ghost">下個月</button>
+                </div>
+              </div>
+              <div class="calendar" id="calendar"></div>
+              <div class="calendar-legend">
+                <span><span class="dot done"></span>已回答</span>
+                <span><span class="dot today"></span>今天</span>
+                <span><span class="dot locked"></span>待解鎖</span>
+              </div>
+            </div>
+            <div class="panel journal-panel">
+              <div class="panel-header">
+                <h2 id="selected-date-label">請先選擇日期</h2>
+                <button id="draw-card" class="accent">抽一張</button>
+              </div>
+              <div class="tarot">
+                <div class="tarot-card" id="tarot-card">
+                  <div class="tarot-face tarot-front">
+                    <div class="tarot-icon">?</div>
+                    <p>點擊抽牌揭示今日提問</p>
+                  </div>
+                  <div class="tarot-face tarot-back">
+                    <h3 id="daily-question">今天的提問</h3>
+                    <p id="daily-question-text">請選擇日期後抽牌</p>
+                    <div class="question-meta" id="question-meta"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="answer">
+                <label for="daily-answer">你的回應</label>
+                <textarea id="daily-answer" placeholder="今天的回答寫在這裡..."></textarea>
+                <div class="answer-actions">
+                  <button id="save-answer" class="ghost">保存</button>
+                  <button id="clear-answer" class="ghost">清除</button>
+                </div>
+              </div>
+              <div class="panel-footer">
+                <div class="hint">所有內容皆儲存在你的瀏覽器本機。</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel review-panel">
+            <div class="panel-header">
+              <h2>近期片段</h2>
+              <div class="subtle">快速回顧最近 7 天的回答</div>
+            </div>
+            <div id="recent-list" class="recent-list"></div>
+          </div>
+          <div class="mobile-dock" data-dock="daily">
+            <button id="draw-card-mobile" class="accent">抽一張</button>
+            <button id="save-answer-mobile" class="ghost">保存</button>
+            <button id="clear-answer-mobile" class="ghost">清除</button>
+          </div>
+        </section>
+
+        <section id="view-deep" class="view">
+          <div class="grid two-col deep-grid">
+            <div class="panel deep-pool-panel">
+              <div class="panel-header">
+                <h2>深度交流題庫</h2>
+                <div class="subtle">從破冰到三星，逐步拉近距離</div>
+              </div>
+              <div class="card-grid" id="deep-categories">
+                <button class="topic-card" data-category="icebreak">
+                  <span>破冰</span>
+                  <strong>輕鬆開始</strong>
+                </button>
+                <button class="topic-card" data-category="star1">
+                  <span>一星</span>
+                  <strong>真實分享</strong>
+                </button>
+                <button class="topic-card" data-category="star2">
+                  <span>二星</span>
+                  <strong>價值探索</strong>
+                </button>
+                <button class="topic-card" data-category="star3">
+                  <span>三星</span>
+                  <strong>深層對話</strong>
+                </button>
+              </div>
+            </div>
+            <div class="panel deep-current-panel">
+              <div class="panel-header">
+                <h2>當前話題</h2>
+                <div class="subtle">適合多人一起回答</div>
+              </div>
+              <div class="deep-question" id="deep-question">請從左側選擇類別抽題</div>
+              <div class="deep-actions">
+                <button id="next-question" class="accent">下一題</button>
+                <button id="save-round" class="ghost">保存本輪</button>
+              </div>
+              <div class="party-area" id="party-area">
+                <div class="party-header">
+                  <h3>派對同屏回答</h3>
+                  <button id="add-participant" class="ghost">新增參與者</button>
+                </div>
+                <div id="participants" class="participants"></div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <h2>交流歷史</h2>
+            </div>
+            <div id="party-history" class="history-list"></div>
+          </div>
+          <div class="mobile-dock" data-dock="deep">
+            <button id="next-question-mobile" class="accent">下一題</button>
+            <button id="save-round-mobile" class="ghost">保存本輪</button>
+            <button id="add-participant-mobile" class="ghost">新增參與者</button>
+          </div>
+        </section>
+
+        <section id="view-settings" class="view">
+          <div class="grid two-col">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>每日提醒</h2>
+                <div class="subtle">在打開網頁時提醒未完成的今日問題</div>
+              </div>
+              <div class="field">
+                <label>
+                  <input type="checkbox" id="reminder-enabled" />
+                  啟用提醒
+                </label>
+              </div>
+              <div class="field">
+                <label for="reminder-time">提醒時間</label>
+                <input type="time" id="reminder-time" value="20:00" />
+              </div>
+              <div class="field">
+                <button id="request-notify" class="ghost">啟用系統通知</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2>私密鎖</h2>
+                <div class="subtle">PIN 僅保存在本機</div>
+              </div>
+              <div class="field">
+                <label>
+                  <input type="checkbox" id="lock-enabled" />
+                  啟用私密鎖
+                </label>
+              </div>
+              <div class="field">
+                <label for="pin-input">設定 PIN</label>
+                <input type="password" id="pin-input" maxlength="8" placeholder="4-8 位數" />
+                <button id="set-pin" class="ghost">設定/更新</button>
+              </div>
+              <div class="field">
+                <button id="lock-now" class="accent">立即上鎖</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid two-col">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>UGC 題庫</h2>
+                <div class="subtle">新增、分享、匯入自訂題目</div>
+              </div>
+              <div class="field">
+                <label for="ugc-type">題目類型</label>
+                <select id="ugc-type">
+                  <option value="daily">一日一問</option>
+                  <option value="weekly">週末覆盤</option>
+                  <option value="monthly">月末覆盤</option>
+                  <option value="quarterly">季末覆盤</option>
+                  <option value="icebreak">破冰</option>
+                  <option value="star1">一星</option>
+                  <option value="star2">二星</option>
+                  <option value="star3">三星</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="ugc-text">題目內容</label>
+                <textarea id="ugc-text" rows="3" placeholder="輸入你的題目..."></textarea>
+              </div>
+              <div class="field">
+                <button id="add-ugc" class="accent">加入題庫</button>
+                <button id="share-ugc" class="ghost">複製分享碼</button>
+              </div>
+              <div class="field">
+                <label for="ugc-import">匯入分享碼</label>
+                <textarea id="ugc-import" rows="2" placeholder='貼上 JSON 分享碼'></textarea>
+                <button id="import-ugc" class="ghost">匯入</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2>匯出與備份</h2>
+                <div class="subtle">匯出 TXT 供備份或分享</div>
+              </div>
+              <div class="field">
+                <button id="export-txt" class="accent">匯出 TXT</button>
+              </div>
+              <div class="field">
+                <button id="export-ugc" class="ghost">匯出 UGC 題庫 JSON</button>
+              </div>
+              <div class="field">
+                <button id="clear-data" class="ghost danger">清除所有本機資料</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="lock-screen" class="lock-screen">
+      <div class="lock-card">
+        <h2>私密模式</h2>
+        <p>請輸入 PIN 以解鎖內容</p>
+        <input type="password" id="unlock-pin" placeholder="PIN" />
+        <div class="lock-actions">
+          <button id="unlock-btn" class="accent">解鎖</button>
+        </div>
+        <div id="lock-message" class="lock-message"></div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
