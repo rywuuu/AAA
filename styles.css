@@ -230,7 +230,18 @@ button.ghost.danger {
   height: 20px;
   stroke: currentColor;
   stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   fill: none;
+  display: block;
+}
+
+.icon-chevron.icon-left {
+  transform: translateX(-0.5px);
+}
+
+.icon-chevron.icon-right {
+  transform: translateX(0.5px);
 }
 
 .sr-only {
