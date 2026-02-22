@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="laptop">
-  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <g stroke="#255e9f" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="70" y="50" width="160" height="90" rx="12" />
+    <path d="M50 150h200" />
+    <path d="M90 90h60" />
+    <path d="M90 110h90" />
+  </g>
+  <g opacity="0.35" transform="translate(2 -1)" stroke="#255e9f" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
     <rect x="70" y="50" width="160" height="90" rx="12" />
     <path d="M50 150h200" />
     <path d="M90 90h60" />

@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="chat">
-  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <g stroke="#255e9f" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="50" y="50" width="130" height="70" rx="16" />
+    <path d="M90 120l-20 20" />
+    <rect x="140" y="90" width="110" height="70" rx="16" />
+    <path d="M210 160l20 18" />
+  </g>
+  <g opacity="0.35" transform="translate(2 -1)" stroke="#255e9f" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
     <rect x="50" y="50" width="130" height="70" rx="16" />
     <path d="M90 120l-20 20" />
     <rect x="140" y="90" width="110" height="70" rx="16" />

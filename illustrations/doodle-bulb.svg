@@ -1,5 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="bulb">
-  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <g stroke="#255e9f" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M150 40c-35 0-55 28-55 55 0 25 12 36 25 47 7 6 10 10 10 18h40c0-8 3-12 10-18 13-11 25-22 25-47 0-27-20-55-55-55z" />
+    <path d="M135 160h30" />
+    <path d="M130 175h40" />
+  </g>
+  <g opacity="0.35" transform="translate(2 -1)" stroke="#255e9f" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
     <path d="M150 40c-35 0-55 28-55 55 0 25 12 36 25 47 7 6 10 10 10 18h40c0-8 3-12 10-18 13-11 25-22 25-47 0-27-20-55-55-55z" />
     <path d="M135 160h30" />
     <path d="M130 175h40" />

@@ -1,5 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="heart">
-  <g stroke="#255e9f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <g stroke="#255e9f" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M150 140c-40-28-60-46-60-70 0-18 14-30 32-30 12 0 22 6 28 16 6-10 16-16 28-16 18 0 32 12 32 30 0 24-20 42-60 70z" />
+    <path d="M90 150h120" />
+  </g>
+  <g opacity="0.35" transform="translate(2 -1)" stroke="#255e9f" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
     <path d="M150 140c-40-28-60-46-60-70 0-18 14-30 32-30 12 0 22 6 28 16 6-10 16-16 28-16 18 0 32 12 32 30 0 24-20 42-60 70z" />
     <path d="M90 150h120" />
   </g>
