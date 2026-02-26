@@ -72,12 +72,16 @@ const DEFAULT_STATE = {
     pinHash: "",
     isLocked: false,
     lastReminderDate: "",
-    partyMode: false
+    partyMode: false,
+    questionMode: "standard"
   },
   dailyEntries: {},
   ugcQuestions: [],
   partyHistory: [],
   partyParticipants: [],
+  uniqueHistory: {
+    usedTexts: []
+  },
   deep: {
     currentCategory: "",
     currentQuestion: "",
@@ -169,6 +173,7 @@ const partyHistoryEl = document.getElementById("party-history");
 const reminderEnabled = document.getElementById("reminder-enabled");
 const reminderTime = document.getElementById("reminder-time");
 const requestNotifyBtn = document.getElementById("request-notify");
+const questionModeInputs = document.querySelectorAll("input[name=\"question-mode\"]");
 const lockEnabled = document.getElementById("lock-enabled");
 const pinInput = document.getElementById("pin-input");
 const setPinBtn = document.getElementById("set-pin");
@@ -202,6 +207,10 @@ init();
 function init() {
   if (state.settings.lockEnabled && state.settings.pinHash) {
     state.settings.isLocked = true;
+    saveState();
+  }
+  if (state.settings.questionMode === "unique") {
+    syncUniqueHistory();
     saveState();
   }
   bindNavigation();
@@ -397,6 +406,18 @@ function bindSettings() {
     }
   });
 
+  questionModeInputs.forEach((input) => {
+    input.addEventListener("change", () => {
+      if (!input.checked) return;
+      state.settings.questionMode = input.value;
+      if (state.settings.questionMode === "unique") {
+        syncUniqueHistory();
+      }
+      saveState();
+      showToast("已更新提問模式");
+    });
+  });
+
   lockEnabled.addEventListener("change", () => {
     state.settings.lockEnabled = lockEnabled.checked;
     if (!state.settings.lockEnabled) {
@@ -549,6 +570,10 @@ function syncSettingsUI() {
   reminderEnabled.checked = state.settings.reminderEnabled;
   reminderTime.value = state.settings.reminderTime;
   lockEnabled.checked = state.settings.lockEnabled;
+  const mode = state.settings.questionMode || "standard";
+  questionModeInputs.forEach((input) => {
+    input.checked = input.value === mode;
+  });
   document.body.classList.toggle("party-mode", state.settings.partyMode);
   partyToggle.textContent = state.settings.partyMode ? "退出派對" : "派對模式";
   if (state.settings.lockEnabled && state.settings.isLocked) {
@@ -680,20 +705,37 @@ function revealDailyQuestion(dateStr) {
     answer: "",
     redrawCount: 0,
     illustration,
+    exhausted: question.exhausted || false,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
   tarotCard.classList.add("revealed");
   dailyQuestionText.textContent = question.text;
-  questionMeta.textContent = question.meta;
+  questionMeta.textContent = buildMetaLabel(state.dailyEntries[dateStr]);
   dailyAnswer.value = "";
   setIllustration(illustration);
+  recordUniqueQuestion(question.text);
+  if (question.exhausted && getQuestionMode() === "unique") {
+    showToast("題庫已用盡，建議新增題目");
+  }
   saveState();
   renderCalendar();
 }
 
+function getQuestionMode() {
+  return state.settings.questionMode || "standard";
+}
+
+function getSeedKey(date) {
+  if (getQuestionMode() === "yearly") {
+    return `${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  }
+  return formatDate(date);
+}
+
 function pickDailyQuestion(date, redrawCount = 0, avoidId = "") {
-  const seed = hashString(`${formatDate(date)}-${redrawCount}`);
+  const seedKey = getSeedKey(date);
+  const seed = hashString(`${seedKey}-${redrawCount}`);
   const rng = seededRandom(seed);
   const weights = buildWeights(date);
   const roll = rng();
@@ -707,23 +749,37 @@ function pickDailyQuestion(date, redrawCount = 0, avoidId = "") {
     }
   }
   const pool = getPool(selectedType);
-  let index = Math.floor(rng() * pool.length);
-  let resolvedId = `${selectedType}-${index}`;
-  if (avoidId && resolvedId === avoidId && pool.length > 1) {
-    index = (index + 1) % pool.length;
-    resolvedId = `${selectedType}-${index}`;
+  let candidates = pool.map((text, index) => ({ text, index }));
+  let exhausted = false;
+  if (getQuestionMode() === "unique") {
+    const usedSet = buildUsedTextSet();
+    candidates = candidates.filter((item) => !usedSet.has(item.text));
+    if (!candidates.length) {
+      exhausted = true;
+      candidates = pool.map((text, index) => ({ text, index }));
+    }
   }
+  if (avoidId && candidates.length > 1) {
+    candidates = candidates.filter((item) => `${selectedType}-${item.index}` !== avoidId);
+    if (!candidates.length) {
+      candidates = pool.map((text, index) => ({ text, index }));
+    }
+  }
+  const picked = candidates[Math.floor(rng() * candidates.length)] || { text: pool[0], index: 0 };
+  const resolvedId = `${selectedType}-${picked.index}`;
   return {
     id: resolvedId,
-    text: pool[index] || DEFAULT_POOLS.daily[0],
+    text: picked.text || DEFAULT_POOLS.daily[0],
     meta: buildMeta(date, selectedType),
-    type: selectedType
+    type: selectedType,
+    exhausted
   };
 }
 
 function pickIllustrationForQuestion(date, questionText, questionType, redrawCount = 0, avoid = "") {
   const pool = getIllustrationPool(questionText, questionType);
-  const seed = hashString(`${formatDate(date)}-illu-${redrawCount}-${questionText}`);
+  const seedKey = getSeedKey(date);
+  const seed = hashString(`${seedKey}-illu-${redrawCount}-${questionText}`);
   const rng = seededRandom(seed);
   let index = Math.floor(rng() * pool.length);
   let picked = pool[index] || ILLUSTRATIONS[0];
@@ -735,12 +791,13 @@ function pickIllustrationForQuestion(date, questionText, questionType, redrawCou
 }
 
 function buildWeights(date) {
+  const mode = getQuestionMode();
   const isWeekEnd = date.getDay() === 0 || date.getDay() === 6;
   const isMonthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate() === date.getDate();
   const isQuarterEnd = isMonthEnd && [2, 5, 8, 11].includes(date.getMonth());
   const base = [
     { type: "daily", weight: 0.7 },
-    { type: "weekly", weight: isWeekEnd ? 0.18 : 0 },
+    { type: "weekly", weight: mode === "yearly" ? 0 : isWeekEnd ? 0.18 : 0 },
     { type: "monthly", weight: isMonthEnd ? 0.08 : 0 },
     { type: "quarterly", weight: isQuarterEnd ? 0.04 : 0 }
   ];
@@ -795,6 +852,7 @@ function redrawDailyQuestion() {
     answer: "",
     redrawCount,
     illustration,
+    exhausted: question.exhausted || false,
     updatedAt: new Date().toISOString()
   };
   tarotCard.classList.add("revealed");
@@ -802,6 +860,10 @@ function redrawDailyQuestion() {
   questionMeta.textContent = buildMetaLabel(state.dailyEntries[dateStr]);
   dailyAnswer.value = "";
   setIllustration(illustration);
+  recordUniqueQuestion(question.text);
+  if (question.exhausted && getQuestionMode() === "unique") {
+    showToast("題庫已用盡，建議新增題目");
+  }
   saveState();
   renderRecent();
   renderCalendar();
@@ -828,10 +890,11 @@ function clearDailyAnswer() {
 
 function buildMetaLabel(entry) {
   if (!entry) return "";
-  if (entry.redrawCount) {
-    return `${entry.meta || ""} · 重抽第 ${entry.redrawCount} 次`.trim();
-  }
-  return entry.meta || "";
+  const parts = [];
+  if (entry.meta) parts.push(entry.meta);
+  if (entry.redrawCount) parts.push(`重抽第 ${entry.redrawCount} 次`);
+  if (entry.exhausted) parts.push("題庫已用盡");
+  return parts.join(" · ");
 }
 
 function setIllustration(filename) {
@@ -866,6 +929,31 @@ function resolveQuestionType(entry) {
     if (DEFAULT_POOLS[prefix]) return prefix;
   }
   return "daily";
+}
+
+function buildUsedTextSet() {
+  const used = new Set(state.uniqueHistory?.usedTexts || []);
+  Object.values(state.dailyEntries).forEach((entry) => {
+    if (entry.question) used.add(entry.question);
+  });
+  return used;
+}
+
+function syncUniqueHistory() {
+  state.uniqueHistory = {
+    usedTexts: Array.from(buildUsedTextSet())
+  };
+}
+
+function recordUniqueQuestion(text) {
+  if (getQuestionMode() !== "unique") return;
+  if (!text) return;
+  if (!state.uniqueHistory) {
+    state.uniqueHistory = { usedTexts: [] };
+  }
+  if (!state.uniqueHistory.usedTexts.includes(text)) {
+    state.uniqueHistory.usedTexts.push(text);
+  }
 }
 
 function renderRecent() {

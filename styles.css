@@ -542,6 +542,33 @@ button.ghost.danger {
   gap: 8px;
 }
 
+.radio-group {
+  gap: 12px;
+}
+
+.radio-option {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 8px 10px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.radio-option input {
+  margin-top: 2px;
+}
+
+.radio-option span:first-of-type {
+  font-weight: 600;
+}
+
+.radio-option .subtle {
+  grid-column: 2 / -1;
+  margin-top: -2px;
+}
+
 .field label {
   font-family: "Noto Sans TC", "Source Han Sans TC", "PingFang TC", sans-serif;
   font-size: 14px;
